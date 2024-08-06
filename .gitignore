@@ -1,52 +1,68 @@
-# Prerequisites
-*.d
+#include <stdio.h>
+#include <stdbool.h>
+#include <time.h>
+#include <string.h>
 
-# Object files
-*.o
-*.ko
-*.obj
-*.elf
+#define MAX_USER_LEN 20
+#define MAX_CARD_LEN 20
 
-# Linker output
-*.ilk
-*.map
-*.exp
+bool isLoggedIn = false;
+char currentUser[MAX_USER_LEN] = "";
 
-# Precompiled Headers
-*.gch
-*.pch
+void detectCard(const char* cardNumber, const char* userName) {
+    if (cardNumber[0] != '\0') {
+        isLoggedIn = true;
+        snprintf(currentUser, sizeof(currentUser), "%s", userName);
+    } else {
+        isLoggedIn = false;
+        currentUser[0] = '\0';
+    }
+}
 
-# Libraries
-*.lib
-*.a
-*.la
-*.lo
+void removeCard() {
+    isLoggedIn = false;
+    currentUser[0] = '\0';
+}
 
-# Shared objects (inc. Windows DLLs)
-*.dll
-*.so
-*.so.*
-*.dylib
+void getCurrentTime(char* buffer, size_t bufferSize) {
+    time_t currentTime = time(NULL);
+    struct tm* timeInfo = localtime(&currentTime);
+    strftime(buffer, bufferSize, "%Y-%m-%d %H:%M:%S", timeInfo);
+}
 
-# Executables
-*.exe
-*.out
-*.app
-*.i*86
-*.x86_64
-*.hex
+void userLoginProcess() {
+    char cardNumber[MAX_CARD_LEN];
+    char userName[MAX_USER_LEN];
 
-# Debug files
-*.dSYM/
-*.su
-*.idb
-*.pdb
+    printf("Insert your card number: ");
+    if (scanf("%19s", cardNumber) != 1) {
+        fprintf(stderr, "Error reading card number.\n");
+        return;
+    }
 
-# Kernel Module Compile Results
-*.mod*
-*.cmd
-.tmp_versions/
-modules.order
-Module.symvers
-Mkfile.old
-dkms.conf
+    printf("Enter your name: ");
+    if (scanf("%19s", userName) != 1) {
+        fprintf(stderr, "Error reading user name.\n");
+        return;
+    }
+
+    detectCard(cardNumber, userName);
+
+    if (isLoggedIn) {
+        printf("Welcome, %s!\n", currentUser);
+    } else {
+        printf("See you later! Please log in next time.\n");
+    }
+}
+
+int main() {
+    char timeBuffer[20];
+
+    userLoginProcess();
+    removeCard();
+
+    getCurrentTime(timeBuffer, sizeof(timeBuffer));
+    printf("Logged out at: %s\n", timeBuffer);
+
+    return 0;
+}
