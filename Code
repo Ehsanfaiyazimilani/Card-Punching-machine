@@ -1,0 +1,68 @@
+#include <stdio.h>
+#include <stdbool.h>
+#include <time.h>
+#include <string.h>
+
+#define MAX_USER_LEN 20
+#define MAX_CARD_LEN 20
+
+bool isLoggedIn = false;
+char currentUser[MAX_USER_LEN] = "";
+
+void detectCard(const char* cardNumber, const char* userName) {
+    if (cardNumber[0] != '\0') {
+        isLoggedIn = true;
+        snprintf(currentUser, sizeof(currentUser), "%s", userName);
+    } else {
+        isLoggedIn = false;
+        currentUser[0] = '\0';
+    }
+}
+
+void removeCard() {
+    isLoggedIn = false;
+    currentUser[0] = '\0';
+}
+
+void getCurrentTime(char* buffer, size_t bufferSize) {
+    time_t currentTime = time(NULL);
+    struct tm* timeInfo = localtime(&currentTime);
+    strftime(buffer, bufferSize, "%Y-%m-%d %H:%M:%S", timeInfo);
+}
+
+void userLoginProcess() {
+    char cardNumber[MAX_CARD_LEN];
+    char userName[MAX_USER_LEN];
+
+    printf("Insert your card number: ");
+    if (scanf("%19s", cardNumber) != 1) {
+        fprintf(stderr, "Error reading card number.\n");
+        return;
+    }
+
+    printf("Enter your name: ");
+    if (scanf("%19s", userName) != 1) {
+        fprintf(stderr, "Error reading user name.\n");
+        return;
+    }
+
+    detectCard(cardNumber, userName);
+
+    if (isLoggedIn) {
+        printf("Welcome, %s!\n", currentUser);
+    } else {
+        printf("See you later! Please log in next time.\n");
+    }
+}
+
+int main() {
+    char timeBuffer[20];
+
+    userLoginProcess();
+    removeCard();
+
+    getCurrentTime(timeBuffer, sizeof(timeBuffer));
+    printf("Logged out at: %s\n", timeBuffer);
+
+    return 0;
+}
